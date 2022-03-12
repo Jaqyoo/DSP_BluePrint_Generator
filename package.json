@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "@types/js-base64": "^3.3.1",
+    "fs-extra": "^10.0.1",
+    "path": "^0.12.7",
+    "scanf": "^1.1.2",
+    "ts-md5": "^1.2.11",
+    "yassb": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.21"
+  },
+  "name": "blueprint_generator",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc main.ts",
+    "prestart": "npm run build",
+    "start":"node main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
