@@ -11,7 +11,7 @@ export class Smelter extends Building{
         let item_id = 2302
         let model_index = 62
         if (level == 2) {
-            item_id = 2315
+            item_id = 2303
             model_index = 194
         }
 
@@ -27,6 +27,7 @@ export class SmelterList extends FactoryList {
     constructor(
         area_index:number,
         local:[number, number, number],
+        recipe_id:number,
         count=[1,1],
         diff=[3,3],
         level = 2
@@ -38,7 +39,7 @@ export class SmelterList extends FactoryList {
             model_index = 194
         }
 
-        super(area_index, item_id, model_index, [1.25, 1.25], count, local[0], local[1], local[2], diff)
+        super(area_index, item_id, model_index, [1.25, 1.25], count, local[0], local[1], local[2], recipe_id, diff)
     }
 
 }

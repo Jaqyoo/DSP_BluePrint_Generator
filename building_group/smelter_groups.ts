@@ -19,6 +19,7 @@ export class NearlySmelterGroup extends BuildingList {
         bp: BluePrint,
         area_index: number,
         local: [number, number],
+        recipe_id:number,
         smelter_level = 2,
         belt_level = 3,
         inserter_level = 3
@@ -26,16 +27,16 @@ export class NearlySmelterGroup extends BuildingList {
         super()
         this.bp = bp
 
-        this.smelters_00 = bp.addBuildings(new SmelterList(area_index, [local[0] + 1.0, local[1] + 1.0, 0.0], [3, 1], [2.5, 5], smelter_level)) as SmelterList
-        this.smelters_00.concat(bp.addBuildings(new SmelterList(area_index, [local[0] + 9.0, local[1] + 1.0, 0.0], [3, 1], [2.5, 5], smelter_level)) as SmelterList)
+        this.smelters_00 = bp.addBuildings(new SmelterList(area_index, [local[0] + 1.0, local[1] + 1.0, 0.0], recipe_id, [3, 1], [2.5, 5], smelter_level)) as SmelterList
+        this.smelters_00.concat(bp.addBuildings(new SmelterList(area_index, [local[0] + 9.0, local[1] + 1.0, 0.0], recipe_id, [3, 1], [2.5, 5], smelter_level)) as SmelterList)
         
-        this.smelters_13 = bp.addBuildings(new SmelterList(area_index, [local[0] + 1.0, local[1] + 3.5, 1.3], [3, 1], [2.5, 5], smelter_level)) as SmelterList
-        this.smelters_13.concat(bp.addBuildings(new SmelterList(area_index, [local[0] + 9.0, local[1] + 3.5, 1.3], [3, 1], [2.5, 5], smelter_level)) as SmelterList)
+        this.smelters_13 = bp.addBuildings(new SmelterList(area_index, [local[0] + 1.0, local[1] + 3.5, 1.3], recipe_id, [3, 1], [2.5, 5], smelter_level)) as SmelterList
+        this.smelters_13.concat(bp.addBuildings(new SmelterList(area_index, [local[0] + 9.0, local[1] + 3.5, 1.3], recipe_id, [3, 1], [2.5, 5], smelter_level)) as SmelterList)
 
         this.ingress_belts = (bp.addBuildings(new BeltList(area_index, 16, [local[0], local[1] + 1, 5], undefined, belt_level)) as BeltList).connect()
         this.egress_belts = (bp.addBuildings(new BeltList(area_index, 16, [local[0], local[1] + 3, 5], undefined, belt_level)) as BeltList).connect()
 
-        this.tesla_coil = bp.addBuilding(new TeslaCoil(area_index, local[0] + 7.5, local[0] + 2.25)) as TeslaCoil
+        this.tesla_coil = bp.addBuilding(new TeslaCoil(area_index, local[0] + 7.5, local[1] + 2.25)) as TeslaCoil
 
         this.ingress_inserters = new Array<Inserter>()
         this.egress_inserters = new Array<Inserter>()

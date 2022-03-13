@@ -24,7 +24,7 @@ export class BuildingHeader {
     parameter_count:number 
 }
 
-class BuilidingParam {
+export class BuilidingParam {
     getCount(){}
 }
 
@@ -110,6 +110,10 @@ export class BuildingList {
     concat(buildings:BuildingList) {
         this.lst = this.lst.concat(buildings.lst)
     }
+
+    push(building:Building) {
+        this.lst.push(building)
+    }
 }
 
 export class FactoryList extends BuildingList {
@@ -119,6 +123,7 @@ export class FactoryList extends BuildingList {
         area_index:number, item_id:number, model_index:number, anti_collision:[number, number],
         count=[1,1],
         x:number, y:number,z:number,
+        recipe_id:number,
         diff=[0,0],
         isDefault = true
     ) {
@@ -135,6 +140,13 @@ export class FactoryList extends BuildingList {
                         item_id, model_index, isDefault))
             }
         }
+        this.setRecipe(recipe_id)
+    }
+
+    setRecipe(recipe_id:number) {
+        this.forEach((building, index, buildings) => {
+            building.header.recipe_id = recipe_id
+        })
     }
 
     getFactoryArea() {
