@@ -40,9 +40,9 @@ export class NearlyAssembler2In1Group extends BuildingList {
         this.assemblers_13 = bp.addBuildings(new AssemblerList(area_index, [local[0] + 1.0, local[1] + 4.5, 1.3], recipe_id, [2, 1], offset, assembler_level)) as AssemblerList
         this.assemblers_13.concat(bp.addBuildings(new AssemblerList(area_index, [local[0] + 8.5, local[1] + 4.5, 1.3], recipe_id, [2, 1], offset, assembler_level)) as AssemblerList)
 
-        this.ingress_belts1 = (bp.addBuildings(new BeltList(area_index, 12, [local[0], local[1] + ingress_belt1_offset, 5], undefined, belt_level)) as BeltList).connect()
-        this.ingress_belts2 = (bp.addBuildings(new BeltList(area_index, 12, [local[0], local[1] + ingress_belt2_offset, 5], undefined, belt_level)) as BeltList).connect()
-        this.egress_belts = (bp.addBuildings(new BeltList(area_index, 12, [local[0], local[1] + egress_belt_offset, 5], undefined, belt_level)) as BeltList).connect()
+        this.ingress_belts1 = bp.addBuildings(new BeltList(area_index, 8, [local[0], local[1] + ingress_belt1_offset, 5], undefined, belt_level)) as BeltList
+        this.ingress_belts2 = bp.addBuildings(new BeltList(area_index, 8, [local[0], local[1] + ingress_belt2_offset, 5], undefined, belt_level)) as BeltList
+        this.egress_belts = bp.addBuildings(new BeltList(area_index, 8, [local[0], local[1] + egress_belt_offset, 5], undefined, belt_level)) as BeltList
 
         this.tesla_coil = bp.addBuilding(new TeslaCoil(area_index, local[0] + 6.5, local[1] + 3)) as TeslaCoil
 
