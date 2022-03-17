@@ -1,16 +1,17 @@
+import { BluePrint } from "../blueprint";
 import { Building, BuildingList, BuilidingParam } from "./builiding";
 
 class BeltParamLabel {
     label: number
     count: number
 
-    constructor(label, count) {
+    constructor(label: number, count: number) {
         this.label = label
         this.count = count
     }
 }
 
-export class BeltParam extends BuilidingParam  {
+export class BeltBlueprintParam extends BuilidingParam  {
     private Belt:null | BeltParamLabel
 
     constructor() {
@@ -44,7 +45,7 @@ export class Belt extends Building {
         local_offset_x:number,
         local_offset_y:number,
         local_offset_z:number,
-        level=3
+        level=3,
     ) {
         let item_id = 2003
         let model_index = 37
@@ -58,7 +59,7 @@ export class Belt extends Building {
             local_offset_x, local_offset_y, local_offset_z,
             local_offset_x, local_offset_y, local_offset_z,
             item_id, model_index, false)
-        this.param = new BeltParam()
+        this.param = new BeltBlueprintParam()
         this.header.parameter_count = 0
     }
     
@@ -103,6 +104,42 @@ export class Belt extends Building {
             }
         }
     }
+}
+
+export function setBeltsLocalAndConnect(belts:Belt[], count: number, startLocal: [number, number, number], diff: [number, number, number]) {
+    for (let index = 0; index < count; index++) {
+        let belt = belts[index];
+        belt.setLocal(startLocal[0] + diff[0] * index, startLocal[1] + diff[1] * index, startLocal[2] + diff[2] * index)
+        if (index < count - 1) {
+            belt.connect(belts[index + 1])
+        }
+    }
+}
+
+// undefined diff means you must set belt local later
+export function appendBelts(bp: BluePrint, belts: Array<Belt>, count: number, diff?: [number, number, number]) {
+    let belt = belts[belts.length - 1]
+    let area_index = belt.header.area_index
+    let x = belt.header.local_offset_x, y = belt.header.local_offset_y, z = belt.header.local_offset_z
+    if (diff === undefined) diff = [0, 0, 0]
+    for (let i = 0; i < count; i++) {
+        let next_belt = new Belt(area_index, x + (i+1)*diff[0], y + (i+1)*diff[1], z + (i+1)*diff[2])
+        bp.addBuilding(next_belt)
+        if (diff !== [0, 0, 0]) belt.connect(next_belt)
+        belts.push(next_belt)
+        belt = next_belt
+    }
+}
+
+export function prependBelts(bp: BluePrint, belts: Array<Belt>, count: number) {
+    let area_index = belts[0].header.area_index
+    let tmp_belts = new Array<Belt>()
+    for (let i = 0; i < count; i++) {
+        let pre_belt = new Belt(area_index, 0, 0, 0)
+        bp.addBuilding(pre_belt)
+        tmp_belts.push(pre_belt)
+    }
+    belts = tmp_belts.concat(belts)
 }
 
 export class BeltList extends BuildingList{
