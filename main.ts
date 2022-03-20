@@ -1,9 +1,5 @@
 import { BluePrint } from "./BP/blueprint";
-import { BeltList } from "./BP/builiding/belt";
 import * as fs from 'fs'
-import { Building } from "./BP/builiding/builiding";
-import { Smelter, SmelterList } from "./BP/builiding/smelter";
-import { NearlySmelterGroup } from "./building_group/smelter_groups";
 import { BlueArray7200 } from "./building_group/7200_blue_array";
 
 // Todo: use system time
@@ -26,6 +22,6 @@ let area_index = bp.addArea(parent_index, tropic_anchor, area_segments,
     anchor_local_offset_x, anchor_local_offset_y, width, height)
 
 let local:[number, number] = [0,0]
-let smelter_group = bp.addBuildings(new BlueArray7200(bp, area_index, local)) as NearlySmelterGroup
+new BlueArray7200(bp, area_index, local)
 
 fs.writeFileSync(process.env.npm_config_output, bp.export())

@@ -1,7 +1,5 @@
-import { time } from "console"
-import { fstat } from "fs"
 import { Area } from "./area"
-import { Building, BuildingList } from "./builiding/builiding"
+import { Building } from "./building/building"
 
 const game_version = '0.9.24.11286'
 
@@ -106,12 +104,8 @@ export class BluePrint {
         return building
     }
 
-    addBuildings(buildings:BuildingList):BuildingList {
-        buildings.forEach((building, index, buildings) => {
-            building.setIndex(this.data.building_count)
-            this.data.buildings.push(building)
-            this.data.building_count++
-        });
+    addBuildings(buildings:Array<Building>):Array<Building> {
+        buildings.forEach(building => this.addBuilding(building))
         return buildings
     }
 }
