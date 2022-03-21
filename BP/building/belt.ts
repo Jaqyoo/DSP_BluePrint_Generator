@@ -1,40 +1,32 @@
 import { BluePrint } from "../blueprint";
-import { Building, BuilidingParam } from "./building";
+import { Building } from "./building";
+import { IBuildingParam } from "./building_param";
 
-class BeltParamLabel {
-    label: number
-    count: number
+export class BeltBlueprintParam implements IBuildingParam {
+    hasParam = false
+    label:number
+    count:number = 0
 
-    constructor(label: number, count: number) {
-        this.label = label
-        this.count = count
-    }
-}
-
-export class BeltBlueprintParam extends BuilidingParam  {
-    private Belt:null | BeltParamLabel
-
-    constructor() {
-        super()
-        this.reset()
-    }
-
-    reset() : number {
-        this.Belt = null
-        return 0
-    }
-
-    setLabel(label:number) : number{
-        this.Belt = new BeltParamLabel(label, 0)
-        return 2
-    }
-
-    getCount(): number {
-        if (this.Belt == null) {
-            return 0
+    constructor(label?:number) {
+        if (label === undefined) {
+            this.hasParam = false
         }
         else {
-            return 2
+            this.label = label
+            this.hasParam = true
+        }
+    }
+    getCount(): number {
+        if(this.hasParam) return 2
+        else return 0
+    }
+
+    toJSON():Object  {
+        if(this.hasParam) {
+            return {"Belt": {label: this.label, count:this.count}}
+        }
+        else {
+            return {"Belt": null}
         }
     }
 }
@@ -44,6 +36,7 @@ export class Belt extends Building {
         area_index:number,
         local:[number, number, number] | null,
         level=3,
+        label?:number
     ) {
         let item_id = 2003
         let model_index = 37
@@ -56,10 +49,10 @@ export class Belt extends Building {
         if (local === null) local = [0, 0, 0]
 
         super(area_index,local, undefined, item_id, model_index, false)
-        this.param = new BeltBlueprintParam()
         this.header.parameter_count = 0
         this.header.output_to_slot = 1
         this.header.input_to_slot = 1
+        this.setParam(new BeltBlueprintParam(label))
     }
 
     connect(next_belt: Belt) {
@@ -90,7 +83,7 @@ export class Belt extends Building {
     }
 
     setLabel(label:number) {
-        this.header.parameter_count = this.param.setLabel(label)
+        this.setParam(new BeltBlueprintParam(label))
     }
 }
 

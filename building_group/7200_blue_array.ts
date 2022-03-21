@@ -1,8 +1,9 @@
 import { BluePrint } from "../BP/blueprint";
 import { Assembler } from "../BP/building/assembler";
 import { Belt, connectBelts } from "../BP/building/belt";
+import { AccelerateMode } from "../BP/building/building_param";
 import { Inserter } from "../BP/building/inserter";
-import { LabStack } from "../BP/building/lab";
+import { LabsParamResearch, LabStack } from "../BP/building/lab";
 import { Smelter } from "../BP/building/smelter";
 import { SprayCoater } from "../BP/building/spray_coater";
 import { TeslaCoil } from "../BP/building/tesla_coil";
@@ -80,7 +81,7 @@ export class BlueArray7200 {
 
         this.labs = new Array<LabStack>()
         for(let i = 0; i < building_num.blue_matrix; i++) {
-            let lab_stack:LabStack = new LabStack(area_index, null, false, undefined, 9) 
+            let lab_stack:LabStack = new LabStack(area_index, null, LabsParamResearch.Produce, undefined, 9, AccelerateMode.Increase) 
             lab_stack.getLabs().forEach(lab => bp.addBuilding(lab))
             lab_stack.initLabStacks()
             this.labs.push(lab_stack)

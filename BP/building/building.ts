@@ -1,4 +1,4 @@
-import { local_diff } from "../../util"
+import { BuildingParamDefault, IBuildingParam } from "./building_param"
 import { InserterLocalParam } from "./inserter"
 
 export class BuildingHeader {
@@ -27,25 +27,10 @@ export class BuildingHeader {
     parameter_count:number 
 }
 
-export class BuilidingParam {
-    getCount(){}
-}
-
-class BuilidingParamUnknown extends BuilidingParam {
-    Unknown:[number]
-    constructor() {
-        super()
-        this.Unknown = [0]
-    }
-
-    getCount(): number {
-        return this.Unknown.length
-    }
-}
 
 export class Building {
     header: BuildingHeader
-    param: any
+    param: IBuildingParam
 
     constructor(
         area_index:number,
@@ -94,10 +79,8 @@ export class Building {
         header.filter_id = 0
         header.parameter_count = 0
 
-        if (isDefault) {
-            this.param = new BuilidingParamUnknown()
-            this.header.parameter_count = this.param.getCount()
-        }
+        this.param = new BuildingParamDefault()
+        this.header.parameter_count = this.param.getCount()
     }
 
     setIndex(index:number) {this.header.index = index}
@@ -152,4 +135,9 @@ export class Building {
     }
 
     getInserterLocal(slot: number, is_ingress: boolean): InserterLocalParam {return null}
+
+    setParam(param: IBuildingParam) {
+        this.param = param
+        this.header.parameter_count = this.param.getCount()
+    }
 }

@@ -1,21 +1,26 @@
 import { local_diff } from "../../util";
-import { Building, BuilidingParam } from "./building";
+import { Building } from "./building";
+import { AccelerateMode as AccelerateMode, BuildingParamDefault, IBuildingParam } from "./building_param";
 import { InserterLocalParam } from "./inserter";
 
-class LabParams extends BuilidingParam {
-    Unknown:[number, number]
-    constructor(isResearch:boolean) {
-        super()
-        if (isResearch) {
-            this.Unknown = [2, 0]
-        }
-        else {
-            this.Unknown = [1, 0]
-        }
-    }
+export enum LabsParamResearch {
+    Reasearch = 2,
+    Produce = 1,
+}
 
+class LabParams implements IBuildingParam {
+    isReseach = LabsParamResearch.Produce
+    accelateMode = AccelerateMode.Increase
+
+    constructor(isResearch:LabsParamResearch, mode = AccelerateMode.Accerlerate) {
+        this.isReseach = isResearch
+        this.accelateMode = mode
+    }
     getCount(): number {
-        return this.Unknown.length
+        return 2
+    }
+    toJSON(): Object {
+        return {"Unknown": [this.isReseach, this.accelateMode == AccelerateMode.Accerlerate ? 0 : 1]}
     }
 }
 
@@ -23,17 +28,17 @@ export class Lab extends Building {
     constructor(
         area_index:number,
         local:[number, number, number]  = null,
-        isResearch: boolean,
+        param_research: LabsParamResearch,
         recipe_id?: number,
+        mode?:AccelerateMode
     ) {
         super(area_index, local, local, 2901, 70, false)
         this.header.output_to_slot = 14
         this.header.input_from_slot = 15
         this.header.output_from_slot = 15
         this.header.input_to_slot = 14
-        this.param = new LabParams(isResearch)
-        this.header.parameter_count = this.param.getCount()
-        if (!isResearch) {
+        this.setParam(new LabParams(param_research, mode))
+        if (param_research == LabsParamResearch.Produce) {
             this.header.recipe_id = recipe_id
         }
     }
@@ -91,15 +96,16 @@ export class LabStack {
     constructor(
         area_index:number,
         local:[number, number] = null,
-        isResearch: boolean,
+        param_research: LabsParamResearch,
         stack = 15,
         recipe_id?: number,
+        accelerate_mode = AccelerateMode.Accerlerate
     )
     {
         if (local === null) local = [0, 0]
         this.labs = new Array()
         for (let index = 0; index < stack; index++) {
-            let lab = new Lab(area_index, [local[0], local[1], index*3], isResearch, recipe_id)
+            let lab = new Lab(area_index, [local[0], local[1], index*3], param_research, recipe_id)
             this.labs.push(lab)
         }
     }
