@@ -1,6 +1,7 @@
 import { BluePrint } from "./BP/blueprint";
 import * as fs from 'fs'
 import { BlueArray7200 } from "./building_group/7200_blue_array";
+import { Station, StationLocalLogic, StationParamsSlot, StationParamStorage, StationRemoteLogic, StationSlotsDir } from "./BP/building/station";
 
 // Todo: use system time
 let timestamp = 637795946688143437
@@ -22,6 +23,10 @@ let area_index = bp.addArea(parent_index, tropic_anchor, area_segments,
     anchor_local_offset_x, anchor_local_offset_y, width, height)
 
 let local:[number, number] = [0,0]
-new BlueArray7200(bp, area_index, local)
+// new BlueArray7200(bp, area_index, local)
+let station = new Station(area_index, [3, 3])
+station.setStorage(0, new StationParamStorage(1001, StationLocalLogic.Egress, StationRemoteLogic.Egress, 20000))
+station.setSlot(0, new StationParamsSlot(StationSlotsDir.Egress, 0))
+bp.addBuilding(station)
 
 fs.writeFileSync(process.env.npm_config_output, bp.export())

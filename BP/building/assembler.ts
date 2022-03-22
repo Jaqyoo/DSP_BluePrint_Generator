@@ -1,5 +1,5 @@
 import { local_diff } from "../../util";
-import { Building } from "./building";
+import { Building } from "../building";
 import { InserterLocalParam } from "./inserter";
 
 export class Assembler extends Building {

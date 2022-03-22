@@ -1,7 +1,7 @@
 import { BluePrint } from "../BP/blueprint";
 import { Assembler } from "../BP/building/assembler";
 import { Belt, connectBelts } from "../BP/building/belt";
-import { AccelerateMode } from "../BP/building/building_param";
+import { AccelerateMode } from "../BP/building_param";
 import { Inserter } from "../BP/building/inserter";
 import { LabsParamResearch, LabStack } from "../BP/building/lab";
 import { Smelter } from "../BP/building/smelter";

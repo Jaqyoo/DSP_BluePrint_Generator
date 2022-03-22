@@ -1,5 +1,5 @@
 import { Area } from "./area"
-import { Building } from "./building/building"
+import { Building } from "./building"
 
 const game_version = '0.9.24.11286'
 

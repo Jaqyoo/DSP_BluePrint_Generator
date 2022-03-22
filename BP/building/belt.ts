@@ -1,6 +1,6 @@
 import { BluePrint } from "../blueprint";
-import { Building } from "./building";
-import { IBuildingParam } from "./building_param";
+import { Building } from "../building";
+import { IBuildingParam } from "../building_param";
 
 export class BeltBlueprintParam implements IBuildingParam {
     hasParam = false

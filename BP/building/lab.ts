@@ -1,6 +1,6 @@
 import { local_diff } from "../../util";
-import { Building } from "./building";
-import { AccelerateMode as AccelerateMode, BuildingParamDefault, IBuildingParam } from "./building_param";
+import { Building } from "../building";
+import { AccelerateMode as AccelerateMode, BuildingParamDefault, IBuildingParam } from "../building_param";
 import { InserterLocalParam } from "./inserter";
 
 export enum LabsParamResearch {

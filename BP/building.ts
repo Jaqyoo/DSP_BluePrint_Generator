@@ -1,5 +1,5 @@
 import { BuildingParamDefault, IBuildingParam } from "./building_param"
-import { InserterLocalParam } from "./inserter"
+import { InserterLocalParam } from "./building/inserter"
 
 export class BuildingHeader {
     index: number

@@ -1,4 +1,4 @@
-import { Building } from "./building"
+import { Building } from "../building"
 
 // 电力感觉塔
 export class TeslaCoil extends Building {    

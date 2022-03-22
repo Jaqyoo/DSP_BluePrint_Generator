@@ -1,5 +1,5 @@
 import { Belt } from "./belt";
-import { Building } from "./building";
+import { Building } from "../building";
 
 export class SprayCoater extends Building {
     constructor(

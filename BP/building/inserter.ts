@@ -1,4 +1,4 @@
-import { Building } from "./building";
+import { Building } from "../building";
 
 export class InserterLocalParam {
     local:[number, number, number]
