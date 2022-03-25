@@ -1,3 +1,5 @@
+import { StationLocalLogic, StationParamsSlot, StationParamStorage, StationRemoteLogic, StationSlotsDir } from "../BP/building/station"
+
 export enum spray_coater_index {
     iron_ore_0 = 0, // for iron plate
     iron_ore_1, // for magnet_plate
@@ -156,3 +158,60 @@ export const belt_num = {
     blue_array_2:10, // 8 + ?
     blue_array_3:10, // 8 + ?
 }
+
+export const station_storage:Array<StationParamStorage> = [
+    {
+        // 铁
+        itemId:1001,
+        localLogic: StationLocalLogic.Storage,
+        remoteLogic: StationRemoteLogic.Storage,
+        max: 20000
+    },
+    {
+        // 铜
+        itemId:1002,
+        localLogic: StationLocalLogic.Storage,
+        remoteLogic: StationRemoteLogic.Storage,
+        max: 20000
+    },
+    {
+        // 增产III
+        itemId:1143,
+        localLogic: StationLocalLogic.Storage,
+        remoteLogic: StationRemoteLogic.Storage,
+        max: 20000
+    },
+    {
+        // 曲率
+        itemId:1210,
+        localLogic: StationLocalLogic.Storage,
+        remoteLogic: StationRemoteLogic.Storage,
+        max: 2000
+    },
+    {
+        // 蓝糖
+        itemId:6001,
+        localLogic: StationLocalLogic.Storage,
+        remoteLogic: StationRemoteLogic.Storage,
+        max: 20000
+    },
+]
+
+export const station_slot = [
+    new StationParamsSlot(StationSlotsDir.Egress, 2), 
+    new StationParamsSlot(StationSlotsDir.Ingress, 3), 
+    new StationParamsSlot(StationSlotsDir.Ingress, 3), 
+    
+    new StationParamsSlot(StationSlotsDir.Ingress, 3), 
+    new StationParamsSlot(StationSlotsDir.Ingress, 3), 
+    null, 
+
+    null,
+    null,
+    null,
+
+    new StationParamsSlot(StationSlotsDir.Egress, 1), 
+    new StationParamsSlot(StationSlotsDir.Egress, 0),
+    new StationParamsSlot(StationSlotsDir.Egress, 0), 
+]
+

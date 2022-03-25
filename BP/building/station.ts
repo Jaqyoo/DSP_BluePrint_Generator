@@ -1,5 +1,8 @@
+import { local_diff } from "../../util";
+import { BluePrint } from "../blueprint";
 import { Building } from "../building";
 import { IBuildingParam } from "../building_param";
+import { Belt, connectBelts } from "./belt";
 
 export enum StationLocalLogic {
     Storage = 0,
@@ -28,8 +31,8 @@ export class StationParamStorage {
 }
 
 export enum StationSlotsDir {
-    Ingress = 0,
     Egress = 1,
+    Ingress = 2,
 }
 
 export class StationParamsSlot {
@@ -38,7 +41,7 @@ export class StationParamsSlot {
 
     constructor(dir:StationSlotsDir = StationSlotsDir.Ingress, storage_idx:number = 0) {
         this.dir = dir
-        this.storage_idx = storage_idx
+        this.storage_idx = storage_idx + 1
     }
 }
 
@@ -76,7 +79,6 @@ export class StationParams implements IBuildingParam {
     }
 
     setStorage(storage_id:number, storage:StationParamStorage) {
-        console.log(storage_id, storage)
         this.storage[storage_id].itemId = storage.itemId
         this.storage[storage_id].localLogic = storage.localLogic
         this.storage[storage_id].remoteLogic = storage.remoteLogic
@@ -132,7 +134,9 @@ export class Station extends Building {
         area_index:number,
         local:[number, number] = null,
     ) {
-        let local_3:[number, number, number] = [local[0], local[1], 0]
+        let local_3:[number, number, number]
+        if (local === null) local_3 = null
+        else local_3 = [local[0], local[1], 0]
         super(area_index, local_3, local_3, 2104, 50)
         this.setParam(new StationParams())
     }
@@ -144,5 +148,52 @@ export class Station extends Building {
 
     setSlot(slot_id:number, param:StationParamsSlot) {
         this.param.setSlot(slot_id, param)
+    }
+
+    getBeltLocal(bp: BluePrint, slot_id:number): [Belt, Belt] {
+        let local_base:[number, number, number] = [this.header.local_offset_x, this.header.local_offset_y, this.header.local_offset_z]
+        let local_station:[number, number, number]
+        let local_slot:[number, number, number]
+        let belts:[Belt, Belt] = [null, null]
+
+        if (slot_id <= 2) {
+            local_station = local_diff(local_base, [slot_id - 1 , -2, 0])
+            local_slot = local_diff(local_base, [slot_id -1, -3, 0])
+        }
+        else if (slot_id <= 5) {
+            local_station = local_diff(local_base, [2,slot_id-4, 0])
+            local_slot = local_diff(local_base, [3, slot_id-4, 0])
+        }
+        else if (slot_id <= 8) {
+            local_station = local_diff(local_base, [7-slot_id, 2, 0])
+            local_slot = local_diff(local_base, [7-slot_id, 3, 0])
+        }
+        else {
+            local_station = local_diff(local_base, [-2, 10-slot_id, 0])
+            local_slot = local_diff(local_base, [-3, 10-slot_id, 0])
+        }
+
+        let belt_slot = new Belt(this.header.area_index, local_slot)
+        let belt_station = new Belt(this.header.area_index, local_station)
+        bp.addBuilding(belt_slot)
+        bp.addBuilding(belt_station)
+
+        if (this.param.slots[slot_id].dir == StationSlotsDir.Egress) {
+            belts[0] = belt_station
+            belts[1] = belt_slot
+            belt_station.header.input_from_slot = slot_id
+            belt_station.header.input_object_index = this.header.index
+            connectBelts(belts)
+        }
+        else {
+            belts[0] = belt_slot
+            belts[1] = belt_station
+            belt_station.header.output_to_slot = slot_id
+            belt_station.header.output_object_index = this.header.index
+            connectBelts(belts)
+            belt_station.header.yaw = belt_slot.header.yaw
+            belt_station.header.yaw2 = belt_slot.header.yaw2
+        }
+        return belts
     }
 }

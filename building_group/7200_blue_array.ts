@@ -1,6 +1,6 @@
 import { BluePrint } from "../BP/blueprint";
 import { Assembler } from "../BP/building/assembler";
-import { Belt, connectBelts } from "../BP/building/belt";
+import { Belt, connectBelts, prependBelts } from "../BP/building/belt";
 import { AccelerateMode } from "../BP/building_param";
 import { Inserter } from "../BP/building/inserter";
 import { LabsParamResearch, LabStack } from "../BP/building/lab";
@@ -8,7 +8,8 @@ import { Smelter } from "../BP/building/smelter";
 import { SprayCoater } from "../BP/building/spray_coater";
 import { TeslaCoil } from "../BP/building/tesla_coil";
 import { local_diff, local_diff_2 } from "../util";
-import { smelter_index, assembler_index, belt_index, ingress_inserter_index, building_num, belt_num, egress_inserter_index } from "./7200_blue_array_params";
+import { smelter_index as SmelterIndex, assembler_index, belt_index, ingress_inserter_index, building_num, belt_num, egress_inserter_index, station_storage, station_slot } from "./7200_blue_array_params";
+import { Station, StationLocalLogic, StationParamsSlot, StationParamStorage, StationRemoteLogic, StationSlotsDir } from "../BP/building/station";
 // import { NearlyAssembler2In1Group } from "./assembler_group";
 
 /**
@@ -34,28 +35,28 @@ export class BlueArray7200 {
 
     tesla_coil: Array<TeslaCoil> 
 
-    station:any
+    station:Station
 
     private init_buildings(bp:BluePrint, area_index:number) {
-        this.smelters = new Array(smelter_index.max)
-        for(let i = 0; i < smelter_index.max; i++) this.smelters[i] = new Array<Smelter>()
+        this.smelters = new Array(SmelterIndex.max)
+        for(let i = 0; i < SmelterIndex.max; i++) this.smelters[i] = new Array<Smelter>()
         for(let i = 0; i < building_num.iron_plate; i++) {
             let smelter = new Smelter(area_index, null)
             bp.addBuilding(smelter)
             smelter.setRecipe(1)
-            this.smelters[smelter_index.iron_plate].push(smelter)
+            this.smelters[SmelterIndex.iron_plate].push(smelter)
         }
         for(let i = 0; i < building_num.magnet_plate; i++) {
             let smelter = new Smelter(area_index, null)
             bp.addBuilding(smelter)
             smelter.setRecipe(2)
-            this.smelters[smelter_index.magnet_plate].push(smelter)
+            this.smelters[SmelterIndex.magnet_plate].push(smelter)
         }
         for(let i = 0; i < building_num.copper_plate; i++) {
             let smelter = new Smelter(area_index, null)
             bp.addBuilding(smelter)
             smelter.setRecipe(3)
-            this.smelters[smelter_index.copper_plate].push(smelter)
+            this.smelters[SmelterIndex.copper_plate].push(smelter)
         }
 
         this.assemblers = new Array(assembler_index.max)
@@ -86,8 +87,17 @@ export class BlueArray7200 {
             lab_stack.initLabStacks()
             this.labs.push(lab_stack)
         }
-
-        // Todo: station
+        
+        this.station = new Station(area_index)
+        bp.addBuilding(this.station)
+        station_storage.forEach((storage, index) => {
+            this.station.setStorage(index, storage)            
+        });
+        station_slot.forEach((slot, index) => {
+            if (slot != null) {
+                this.station.setSlot(index, slot)
+            }
+        })
 
         this.tesla_coil = new Array()
     }
@@ -130,7 +140,6 @@ export class BlueArray7200 {
         for(let i = 0; i < belt_num.blue_array_1; i++) this.belts[belt_index.blue_matrix_1].push(bp.addBuilding(new Belt(area_index, null)) as Belt)
         for(let i = 0; i < belt_num.blue_array_2; i++) this.belts[belt_index.blue_matrix_2].push(bp.addBuilding(new Belt(area_index, null)) as Belt)
         for(let i = 0; i < belt_num.blue_array_3; i++) this.belts[belt_index.blue_matrix_3].push(bp.addBuilding(new Belt(area_index, null)) as Belt)
-
         
         this.belts[belt_index.iron_ore_0][0].setLabel(1001)
         this.belts[belt_index.iron_ore_1][0].setLabel(1001)
@@ -273,24 +282,43 @@ export class BlueArray7200 {
         for (let i = 6; i < 12; i++) smelter_diff_12[i] = local_diff(smelter_diff_12[i - 6], [0, 2.5, 1.3])
         
         let local_base_smelter_iron_plate = local_diff(local_base, [0, 0, 0])
-        for (let i = 0; i < 12; i++) this.smelters[smelter_index.iron_plate][i].setLocal(local_diff(local_base_smelter_iron_plate, smelter_diff_12[i]))
+        for (let i = 0; i < 12; i++) this.smelters[SmelterIndex.iron_plate][i].setLocal(local_diff(local_base_smelter_iron_plate, smelter_diff_12[i]))
         this.addTeslaCoil(local_diff_2(local_base_smelter_iron_plate, [7.55, 2.5, 0]))
-        for (let i = 12; i < 24; i++) this.smelters[smelter_index.iron_plate][i].setLocal(local_diff(local_diff(local_base_smelter_iron_plate, [0, 5, 0]), smelter_diff_12[i - 12]))        
+        for (let i = 12; i < 24; i++) this.smelters[SmelterIndex.iron_plate][i].setLocal(local_diff(local_diff(local_base_smelter_iron_plate, [0, 5, 0]), smelter_diff_12[i - 12]))        
         this.addTeslaCoil(local_diff_2(local_base_smelter_iron_plate, [7.55, 7.5, 0]))
         
+        
         let local_base_smelter_copper_plate = local_diff(local_base, [0, 10, 0])
-        for (let i = 0; i < 12; i++) this.smelters[smelter_index.copper_plate][i].setLocal(local_diff(local_base_smelter_copper_plate, smelter_diff_12[i]))
+        for (let i = 0; i < 12; i++) this.smelters[SmelterIndex.copper_plate][i].setLocal(local_diff(local_base_smelter_copper_plate, smelter_diff_12[i]))
         this.addTeslaCoil(local_diff_2(local_base_smelter_copper_plate, [7.55, 2.5, 0]))
-        for (let i = 12; i < 24; i++) this.smelters[smelter_index.copper_plate][i].setLocal(local_diff(local_diff(local_base_smelter_copper_plate, [0, 5, 0]), smelter_diff_12[i - 12]))
+        for (let i = 12; i < 24; i++) this.smelters[SmelterIndex.copper_plate][i].setLocal(local_diff(local_diff(local_base_smelter_copper_plate, [0, 5, 0]), smelter_diff_12[i - 12]))
         this.addTeslaCoil(local_diff_2(local_base_smelter_copper_plate, [7.55, 7.5, 0]))
 
+
         let local_base_smelter_magnet_plate = local_diff(local_base, [0, 20, 0])
-        for (let i = 0; i < 12; i++) this.smelters[smelter_index.magnet_plate][i].setLocal(local_diff(local_base_smelter_magnet_plate, smelter_diff_12[i]))
+        for (let i = 0; i < 12; i++) this.smelters[SmelterIndex.magnet_plate][i].setLocal(local_diff(local_base_smelter_magnet_plate, smelter_diff_12[i]))
         this.addTeslaCoil(local_diff_2(local_base_smelter_magnet_plate, [7.55, 2.5, 0]))
-        for (let i = 12; i < 24; i++) this.smelters[smelter_index.magnet_plate][i].setLocal(local_diff(local_diff(local_base_smelter_magnet_plate, [0, 5, 0]), smelter_diff_12[i - 12]))
+        for (let i = 12; i < 24; i++) this.smelters[SmelterIndex.magnet_plate][i].setLocal(local_diff(local_diff(local_base_smelter_magnet_plate, [0, 5, 0]), smelter_diff_12[i - 12]))
         this.addTeslaCoil(local_diff_2(local_base_smelter_magnet_plate, [7.55, 7.5, 0]))
-        for (let i = 24; i < 36; i++) this.smelters[smelter_index.magnet_plate][i].setLocal(local_diff(local_diff(local_base_smelter_magnet_plate, [0, 10, 0]), smelter_diff_12[i -24]))
+        for (let i = 24; i < 36; i++) this.smelters[SmelterIndex.magnet_plate][i].setLocal(local_diff(local_diff(local_base_smelter_magnet_plate, [0, 10, 0]), smelter_diff_12[i -24]))
         this.addTeslaCoil(local_diff_2(local_base_smelter_magnet_plate, [7.55, 12.5, 0]))
+                
+        for (let i = 0; i < 24; i++) {
+            let smelter = this.smelters[SmelterIndex.copper_plate][i]
+            this.setIngressInserterWithSmelter(ingress_inserter_index.copper_plate, i, smelter, smelter.getLocal()[2] == 0 ? 6 : 2, belt_index.copper_ore, i)
+            this.setEgressInserterWithSmelter(egress_inserter_index.copper_plate, i, smelter, smelter.getLocal()[2] == 0 ? 7 : 1, belt_index.copper_plate_0 + Math.floor(i / 6), i % 6)
+        }
+        for (let i = 0; i < 24; i++) {
+            let smelter = this.smelters[SmelterIndex.iron_plate][i]
+            // console.log(this.belts[belt_index.iron_ore_0])
+            this.setIngressInserterWithSmelter(ingress_inserter_index.iron_plate, i, smelter, smelter.getLocal()[2] == 0 ? 6 : 2, belt_index.iron_ore_0, i)
+            this.setEgressInserterWithSmelter(egress_inserter_index.iron_plate, i, smelter, smelter.getLocal()[2] == 0 ? 7 : 1, belt_index.iron_plate_0 + Math.floor(i / 6), i % 6)
+        }
+        for (let i = 0; i < 36; i++) {
+            let smelter = this.smelters[SmelterIndex.magnet_plate][i]
+            this.setIngressInserterWithSmelter(ingress_inserter_index.magnet_plate, i, smelter, smelter.getLocal()[2] == 0 ? 6 : 2, belt_index.iron_ore_1, i)
+            this.setEgressInserterWithSmelter(egress_inserter_index.magnet_plate, i, smelter, smelter.getLocal()[2] == 0 ? 7 : 1, belt_index.magnet_plate_0 + Math.floor(i / 9), i % 9)
+        }
     }
 
     private setAssemblersLocal(local_base:[number, number, number]) {
@@ -306,12 +334,24 @@ export class BlueArray7200 {
         this.addTeslaCoil(local_diff_2(local_base_assembler_circuit_board, [7.25, 3.5, 0]))
         for (let i = 8; i < 16; i++) this.assemblers[assembler_index.circuit_board][i].setLocal(local_diff(local_diff(local_base_assembler_circuit_board, [0,7,0]), assembler_diff_8[i - 8]))
         this.addTeslaCoil(local_diff_2(local_base_assembler_circuit_board, [7.25, 7.0, 0]))
+        for (let i = 0; i < 16; i++) {
+            let assembler = this.assemblers[assembler_index.circuit_board][i]
+            this.setIngressInserterWithAssembler(ingress_inserter_index.circuit_board_0, i, assembler, assembler.getLocal()[2] == 0 ? 6 : 2, belt_index.iron_plate_0 + Math.floor(i / 4), i % 4)
+            this.setIngressInserterWithAssembler(ingress_inserter_index.circuit_board_1, i, assembler, assembler.getLocal()[2] == 0 ? 7 : 1, belt_index.copper_plate_0 + Math.floor(i / 8), i % 8)
+            this.setEgressInserterWithAssembler(egress_inserter_index.circuit_board, i, assembler, assembler.getLocal()[2] == 0 ? 8 : 0, belt_index.circuit_board_0 + Math.floor(i / 4), i % 4)
+        }
 
         let local_base_assembler_magnetism_wire = local_diff(local_base, [15.5, 15.5, 0])
         for (let i = 0; i < 8; i++) this.assemblers[assembler_index.magnetism_wire][i].setLocal(local_diff(local_base_assembler_magnetism_wire, assembler_diff_8[i]))
         this.addTeslaCoil(local_diff_2(local_base_assembler_magnetism_wire, [7.25, 3.5, 0]))
         for (let i = 8; i < 16; i++) this.assemblers[assembler_index.magnetism_wire][i].setLocal(local_diff(local_diff(local_base_assembler_magnetism_wire, [0,7,0]), assembler_diff_8[i - 8]))
         this.addTeslaCoil(local_diff_2(local_base_assembler_magnetism_wire, [7.25, 7, 0]))
+        for (let i = 0; i < 16; i++) {
+            let assembler = this.assemblers[assembler_index.magnetism_wire][i]
+            this.setIngressInserterWithAssembler(ingress_inserter_index.magnetism_wire_0, i, assembler, assembler.getLocal()[2] == 0 ? 6 : 2, belt_index.magnet_plate_0 + Math.floor(i / 4), i % 4)
+            this.setIngressInserterWithAssembler(ingress_inserter_index.magnetism_wire_1, i, assembler, assembler.getLocal()[2] == 0 ? 7 : 1, belt_index.copper_plate_2 + Math.floor(i / 8), i % 8)
+            this.setEgressInserterWithAssembler(egress_inserter_index.magnetism_wire, i, assembler, assembler.getLocal()[2] == 0 ? 8 : 0, belt_index.magnetism_wire_0 + Math.floor(i / 4), i % 4)
+        }
 
     }
 
@@ -367,54 +407,54 @@ export class BlueArray7200 {
 
     private setBeltsAndSprayCoaterLocal(local_base:[number, number, number]) {
         // // set belts and spray roater
-        let local_base_copper_ore:[number, number, number] = [3, 31, 6]
+        let local_base_copper_ore:[number, number, number] = local_diff(local_base, [3, 31, 6])
         this.belts[belt_index.copper_ore].forEach((belt, index) => {belt.setLocal(local_diff(local_base_copper_ore, [0, -1 * index, 0]))})
         this.spray_coaters[belt_index.copper_ore].setLocalByBelt(this.belts[belt_index.copper_ore][3], 180)
 
-        let local_base_iron_ore_0:[number, number, number] = [4, 31, 6]
+        let local_base_iron_ore_0:[number, number, number] = local_diff(local_base, [4, 31, 6])
         this.belts[belt_index.iron_ore_0].forEach((belt, index) => {belt.setLocal(local_diff(local_base_iron_ore_0, [0, -1 * index, 0]))})
         this.spray_coaters[belt_index.iron_ore_0].setLocalByBelt(this.belts[belt_index.iron_ore_0][3], 180)
 
         // 24 + 18
-        let local_base_iron_ore_1_0:[number, number, number] = [5 + 17, 25, 6]
-        let local_base_iron_ore_1_1:[number, number, number] = [5, 25, 6]
+        let local_base_iron_ore_1_0:[number, number, number] = local_diff(local_base, [5 + 17, 25, 6])
+        let local_base_iron_ore_1_1:[number, number, number] = local_diff(local_base, [5, 25, 6])
         this.belts[belt_index.iron_ore_1].forEach((belt, index) => {
             if (index < 18) belt.setLocal(local_diff(local_base_iron_ore_1_0, [-1 * index, 0, 0]))
             else belt.setLocal(local_diff(local_base_iron_ore_1_1, [0, -1 * (index - 18), 0]))
         })
         this.spray_coaters[belt_index.iron_ore_1].setLocalByBelt(this.belts[belt_index.iron_ore_1][3], 90)
 
-        let local_base_belt_iron_plate:[number, number, number] = [10, 1, 5]
+        let local_base_belt_iron_plate:[number, number, number] = local_diff(local_base, [10, 1, 5])
         for(let i = belt_index.iron_plate_0; i <= belt_index.iron_plate_3; i++) {
             this.belts[i].forEach((belt, index) => {belt.setLocal(local_diff(local_diff(local_base_belt_iron_plate, [0, i - belt_index.iron_plate_0, 0]), [1 * index, 0, 0]))})
             this.spray_coaters[i].setLocalByBelt(this.belts[i][9], 90)
         }
         
-        let local_base_belt_magnet_plate:[number, number, number] = [7, 5, 5]
+        let local_base_belt_magnet_plate:[number, number, number] = local_diff(local_base, [7, 5, 5])
         for(let i = belt_index.magnet_plate_0; i <= belt_index.magnet_plate_3; i++) {
             this.belts[i].forEach((belt, index) => {belt.setLocal(local_diff(local_diff(local_base_belt_magnet_plate, [0, i - belt_index.magnet_plate_0, 0]), [1 * index, 0, 0]))})
             this.spray_coaters[i].setLocalByBelt(this.belts[i][12], 90)
         }
 
-        let local_base_belt_copper_plate:[number, number, number] = [2, 9, 5]
+        let local_base_belt_copper_plate:[number, number, number] = local_diff(local_base, [2, 9, 5])
         for(let i = belt_index.copper_plate_0; i <= belt_index.copper_plate_3; i++) {
             this.belts[i].forEach((belt, index) => {belt.setLocal(local_diff(local_diff(local_base_belt_copper_plate, [0, i - belt_index.copper_plate_0, 0]), [1 * index, 0, 0]))})
             this.spray_coaters[i].setLocalByBelt(this.belts[i][9], 90)
         }
 
-        let local_base_belt_circuit_board:[number, number, number] = [12, 13, 5]
+        let local_base_belt_circuit_board:[number, number, number] = local_diff(local_base, [12, 13, 5])
         for(let i = belt_index.circuit_board_0; i <= belt_index.circuit_board_3; i++) {
             this.belts[i].forEach((belt, index) => {belt.setLocal(local_diff(local_diff(local_base_belt_circuit_board, [0, i - belt_index.circuit_board_0, 0]), [1 * index, 0, 0]))})
             this.spray_coaters[i].setLocalByBelt(this.belts[i][7], 90)
         }
 
-        let local_base_belt_magnetism_wire:[number, number, number] = [12, 17, 5]
+        let local_base_belt_magnetism_wire:[number, number, number] = local_diff(local_base, [12, 17, 5])
         for(let i = belt_index.magnetism_wire_0; i <= belt_index.magnetism_wire_3; i++) {
             this.belts[i].forEach((belt, index) => {belt.setLocal(local_diff(local_diff(local_base_belt_magnetism_wire, [0, i - belt_index.magnetism_wire_0, 0]), [1 * index, 0, 0]))})
             this.spray_coaters[i].setLocalByBelt(this.belts[i][7], 90)
         }
 
-        let local_base_belt_blue_array:[number, number, number] = [3, 21, 5]
+        let local_base_belt_blue_array:[number, number, number] = local_diff(local_base, [3, 21, 5])
         for(let i = belt_index.blue_matrix_0; i <= belt_index.blue_matrix_3; i++) {
             this.belts[i].forEach((belt, index) => {belt.setLocal(local_diff(local_diff(local_base_belt_blue_array, [0, i - belt_index.blue_matrix_0, 0]), [1 * index, 0, 0]))})
         }
@@ -425,6 +465,11 @@ export class BlueArray7200 {
 
     }
 
+
+    private setStationLocal(local_base:[number, number, number]) {
+        this.station.setLocal(local_diff(local_base, [22.75, 31, 0]))
+    }
+
     constructor(
         bp: BluePrint,
         area_index: number,
@@ -432,95 +477,73 @@ export class BlueArray7200 {
     ) {
         this.bp = bp
         this.area_index = area_index
+        let local_base:[number, number, number] = [local[0], local[1], 0]
+
+        this.init_belts(bp, area_index)
 
         this.init_buildings(bp, area_index)
-        this.init_belts(bp, area_index)
+        this.setBeltsAndSprayCoaterLocal(local_base)
         this.init_ingress_inserters(bp, area_index)
         this.init_egress_inserters(bp, area_index)
 
         // set local
         // set building
-        let local_base:[number, number, number] = [local[0], local[1], 0]
         this.setSmeltersLocal(local_base)
         this.setAssemblersLocal(local_base)
-        this.setBeltsAndSprayCoaterLocal(local_base)
         this.setLabsLocal(local_base)
+        this.setStationLocal(local_base)
 
-
-        this.setIngressInserterWithSmelter(ingress_inserter_index.iron_plate, smelter_index.iron_plate, belt_index.iron_ore_0)
-        this.setIngressInserterWithSmelter(ingress_inserter_index.magnet_plate, smelter_index.magnet_plate, belt_index.iron_ore_1)
-        this.setIngressInserterWithSmelter(ingress_inserter_index.copper_plate, smelter_index.copper_plate, belt_index.copper_ore)
-        this.setEgressInserterWithSmelter(egress_inserter_index.iron_plate, smelter_index.iron_plate, belt_index.iron_plate_0, 4)
-        this.setEgressInserterWithSmelter(egress_inserter_index.magnet_plate, smelter_index.magnet_plate, belt_index.magnet_plate_0, 4)
-        this.setEgressInserterWithSmelter(egress_inserter_index.copper_plate, smelter_index.copper_plate, belt_index.copper_plate_0, 4)
-
-        this.setIngressInserterWithAssembler(ingress_inserter_index.magnetism_wire_0, 2, assembler_index.magnetism_wire, belt_index.magnet_plate_0, 4)
-        this.setIngressInserterWithAssembler(ingress_inserter_index.magnetism_wire_1, 1, assembler_index.magnetism_wire, belt_index.copper_plate_0, 2)
-        this.setEgressInserterWithAssembler(egress_inserter_index.magnetism_wire, 0, assembler_index.magnetism_wire, belt_index.magnetism_wire_0, 4)
+        this.belts[belt_index.iron_ore_0] = prependBelts(this.bp, this.belts[belt_index.iron_ore_0], 12, [-1, 0, 0])
+        // this.belts[belt_index.iron_ore_0] = prependBelts(this.bp, this.belts[belt_index.iron_ore_0], 6, [0, 0, 1])
+        // this.belts[belt_index.iron_ore_0] = prependBelts(this.bp, this.belts[belt_index.iron_ore_0], 2, [-1, 0, 0])
 
         
-        this.setIngressInserterWithAssembler(ingress_inserter_index.circuit_board_0, 2, assembler_index.circuit_board, belt_index.magnet_plate_0, 4)
-        this.setIngressInserterWithAssembler(ingress_inserter_index.circuit_board_1, 1, assembler_index.circuit_board, belt_index.copper_plate_2, 2)
-        this.setEgressInserterWithAssembler(egress_inserter_index.circuit_board, 0, assembler_index.circuit_board, belt_index.circuit_board_0, 4)
-    }
+        this.belts[belt_index.copper_ore] = prependBelts(this.bp, this.belts[belt_index.copper_ore], 1, [0, -1, 0])
+        this.belts[belt_index.copper_ore] = prependBelts(this.bp, this.belts[belt_index.copper_ore], 13, [-1, 0, 0])
+        // this.belts[belt_index.copper_ore] = prependBelts(this.bp, this.belts[belt_index.copper_ore], 6, [0, 0, 1])
+        // this.belts[belt_index.copper_ore] = prependBelts(this.bp, this.belts[belt_index.copper_ore], 2, [-1, 0, 0])
 
-    private setIngressInserterWithSmelter(inserter_index:ingress_inserter_index, smelter_index:smelter_index, belt_index:belt_index) {
-        this.inserters_ingress[inserter_index].forEach((inserter, index) => {
-            let smelter = this.smelters[smelter_index][index]
-            let slot:number =  smelter.getLocal()[2] == 0 ? 6 : 2
-            let param = smelter.getInserterLocal(slot, true)
-            param.setInputObject(this.belts[belt_index][this.belts[belt_index].length - 1 - index])
-            param.setOutputFromSlot(0)
-            param.setInputToSlot(1)
-            inserter.setLocalParam(param)
-        })
-    }
-    
-    // private setIngressInserterWithSmelter1(inserter_index:ingress_inserter_index, inserter_offset:number, smelter:Smelter, slot:number, belt_index:belt_index, belt_offset:number) {
-    //     let inserter = this.inserters_ingress[inserter_index][inserter_offset]
-    //     let param = smelter.getInserterLocal(slot, true)
-    //     param.setInputObject(this.belts[belt_index][belt_offset])
-    //     param.setOutputFromSlot(0)
-    //     param.setInputToSlot(1)
-    //     inserter.setLocalParam(param)
-    // }
-
-    private setEgressInserterWithSmelter(inserter_index:egress_inserter_index, smelter_index:smelter_index, belt_index_begin:belt_index, count:number) {
-        this.inserters_egress[inserter_index].forEach((inserter, index) => {
-            let smelter = this.smelters[smelter_index][index]
-            let slot:number =  smelter.getLocal()[2] == 0 ? 7 : 1
-            let param = smelter.getInserterLocal(slot, false)
-            param.setOutputObject(this.belts[belt_index_begin + Math.floor(index/count)][Math.floor(index/count)])
-            param.setOutputToSlot(-1)
-            param.setOutputFromSlot(0)
-            param.setInputToSlot(1)
-            inserter.setLocalParam(param)
+ 
+        station_slot.forEach((slot, index) => {
+            if (slot != null)  this.station.getBeltLocal(bp, index)
         })
     }
 
-    private setIngressInserterWithAssembler(inserter_index:ingress_inserter_index, vslot:number, assembler_index:assembler_index, belt_index_begin:belt_index, count:number) {
-        this.inserters_ingress[inserter_index].forEach((inserter, index) => {
-            let assembler = this.assemblers[assembler_index][index]
-            let slot:number =  assembler.getLocal()[2] == 0 ? 8 - vslot : vslot
-            let param = assembler.getInserterLocal(slot, true)
-            param.setInputObject(this.belts[belt_index_begin + Math.floor(index/count)][this.belts[belt_index_begin + Math.floor(index/count)].length - 1 - Math.floor(index/count)])
-            param.setOutputFromSlot(0)
-            param.setInputToSlot(1)
-            inserter.setLocalParam(param)
-        })
+    private setIngressInserterWithSmelter(inserter_index:ingress_inserter_index, inserter_offset:number, smelter:Smelter, slot:number, belt_index:belt_index, belt_offset:number) {
+        let inserter = this.inserters_ingress[inserter_index][inserter_offset]
+        let param = smelter.getInserterLocal(slot, true)
+        param.setInputObject(this.belts[belt_index][this.belts[belt_index].length - 1 - belt_offset])
+        param.setOutputFromSlot(0)
+        param.setInputToSlot(1)
+        inserter.setLocalParam(param)
     }
-    
-    private setEgressInserterWithAssembler(inserter_index:egress_inserter_index, vslot:number, assembler_index:assembler_index, belt_index_begin:belt_index, count:number) {
-        this.inserters_egress[inserter_index].forEach((inserter, index) => {
-            let assembler = this.assemblers[assembler_index][index]
-            let slot:number =  assembler.getLocal()[2] == 0 ? 8 - vslot : vslot
-            let param = assembler.getInserterLocal(slot, false)
-            param.setOutputObject(this.belts[belt_index_begin + Math.floor(index/count)][Math.floor(index/count)])
-            param.setOutputToSlot(-1)
-            param.setOutputFromSlot(0)
-            param.setInputToSlot(1)
-            inserter.setLocalParam(param)
-        })
+
+    private setEgressInserterWithSmelter(inserter_index:egress_inserter_index, inserter_offset:number, smelter:Smelter, slot:number, belt_index:belt_index, belt_offset:number) {
+        let inserter = this.inserters_egress[inserter_index][inserter_offset]
+        let param = smelter.getInserterLocal(slot, true)
+        param.setInputObject(this.belts[belt_index][belt_offset])
+        param.setOutputFromSlot(0)
+        param.setInputToSlot(1)
+        inserter.setLocalParam(param)
+    }
+
+    private setIngressInserterWithAssembler(inserter_index:ingress_inserter_index, inserter_offset:number, assembler:Assembler, slot:number, belt_index:belt_index, belt_offset:number) {
+        let inserter = this.inserters_ingress[inserter_index][inserter_offset]
+        let param = assembler.getInserterLocal(slot, true)
+        param.setInputObject(this.belts[belt_index][belt_offset])
+        param.setOutputFromSlot(0)
+        param.setInputToSlot(1)
+        inserter.setLocalParam(param)
+    }
+
+    private setEgressInserterWithAssembler(inserter_index:egress_inserter_index, inserter_offset:number, assembler:Assembler, slot:number, belt_index:belt_index, belt_offset:number) {
+        let inserter = this.inserters_egress[inserter_index][inserter_offset]
+        let param = assembler.getInserterLocal(slot, false)
+        param.setOutputObject(this.belts[belt_index][belt_offset])
+        param.setOutputToSlot(-1)
+        param.setOutputFromSlot(0)
+        param.setInputToSlot(1)
+        inserter.setLocalParam(param)
     }
 
     private setIngressInserterWithLab(inserter_index:ingress_inserter_index, inserter_offset:number, labs:LabStack, slot:number, belt_index:belt_index, belt_offset:number) {

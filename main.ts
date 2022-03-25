@@ -23,10 +23,6 @@ let area_index = bp.addArea(parent_index, tropic_anchor, area_segments,
     anchor_local_offset_x, anchor_local_offset_y, width, height)
 
 let local:[number, number] = [0,0]
-// new BlueArray7200(bp, area_index, local)
-let station = new Station(area_index, [3, 3])
-station.setStorage(0, new StationParamStorage(1001, StationLocalLogic.Egress, StationRemoteLogic.Egress, 20000))
-station.setSlot(0, new StationParamsSlot(StationSlotsDir.Egress, 0))
-bp.addBuilding(station)
+new BlueArray7200(bp, area_index, local)
 
 fs.writeFileSync(process.env.npm_config_output, bp.export())

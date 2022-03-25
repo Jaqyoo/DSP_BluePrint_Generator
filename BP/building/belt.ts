@@ -120,13 +120,19 @@ export function appendBelts(bp: BluePrint, belts: Array<Belt>, count: number, di
     }
 }
 
-export function prependBelts(bp: BluePrint, belts: Array<Belt>, count: number) {
+export function prependBelts(bp: BluePrint, belts: Array<Belt>, count: number, diff: [number, number, number] = [0, 0, 0]):Array<Belt> {
     let area_index = belts[0].header.area_index
     let tmp_belts = new Array<Belt>()
+
+    let belt = belts[0]
+    let x = belt.header.local_offset_x, y = belt.header.local_offset_y, z = belt.header.local_offset_z
     for (let i = 0; i < count; i++) {
-        let pre_belt = new Belt(area_index, [0, 0, 0])
+        let pre_belt = new Belt(area_index, [x - (i+1)*diff[0], y - (i+1)*diff[1], z - (i+1)*diff[2]])
         bp.addBuilding(pre_belt)
+        if (diff !== [0, 0, 0]) pre_belt.connect(belt)
         tmp_belts.push(pre_belt)
+        belt = pre_belt
     }
-    belts = tmp_belts.concat(belts)
+    tmp_belts = tmp_belts.concat(belts)
+    return tmp_belts
 }
