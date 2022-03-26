@@ -150,7 +150,7 @@ export class Station extends Building {
         this.param.setSlot(slot_id, param)
     }
 
-    getBeltLocal(bp: BluePrint, slot_id:number): [Belt, Belt] {
+    setBeltLocal(bp: BluePrint, slot_id:number): [Belt, Belt] {
         let local_base:[number, number, number] = [this.header.local_offset_x, this.header.local_offset_y, this.header.local_offset_z]
         let local_station:[number, number, number]
         let local_slot:[number, number, number]
@@ -183,17 +183,17 @@ export class Station extends Building {
             belts[1] = belt_slot
             belt_station.header.input_from_slot = slot_id
             belt_station.header.input_object_index = this.header.index
-            connectBelts(belts)
+            connectBelts([belt_station, belt_slot])
         }
         else {
             belts[0] = belt_slot
             belts[1] = belt_station
             belt_station.header.output_to_slot = slot_id
             belt_station.header.output_object_index = this.header.index
-            connectBelts(belts)
+            connectBelts([belt_slot, belt_station])
             belt_station.header.yaw = belt_slot.header.yaw
             belt_station.header.yaw2 = belt_slot.header.yaw2
         }
-        return belts
+        return [belt_slot, belt_station]
     }
 }

@@ -68,6 +68,17 @@ export enum belt_index {
     blue_matrix_2,
     blue_matrix_3,
 
+    accelerator,
+
+    station_iron_ore_0,
+    station_iron_ore_1,
+    station_copper_ore,
+    station_accelerator,
+    station_blue_matrix_0,
+    station_blue_matrix_1,
+    station_blue_matrix_2,
+    station_blue_matrix_3,
+
     max,
 }
 
@@ -153,10 +164,10 @@ export const belt_num = {
     magnetism_wire_2: 18, // 4 + 6 + 8
     magnetism_wire_3: 18, // 4 + 6 + 8
 
-    blue_array_0:10, // 8 + ?
-    blue_array_1:10, // 8 + ?
-    blue_array_2:10, // 8 + ?
-    blue_array_3:10, // 8 + ?
+    blue_array_0:8, // 8 + ?
+    blue_array_1:8, // 8 + ?
+    blue_array_2:8, // 8 + ?
+    blue_array_3:8, // 8 + ?
 }
 
 export const station_storage:Array<StationParamStorage> = [
@@ -198,20 +209,20 @@ export const station_storage:Array<StationParamStorage> = [
 ]
 
 export const station_slot = [
-    new StationParamsSlot(StationSlotsDir.Egress, 2), 
-    new StationParamsSlot(StationSlotsDir.Ingress, 3), 
-    new StationParamsSlot(StationSlotsDir.Ingress, 3), 
-    
-    new StationParamsSlot(StationSlotsDir.Ingress, 3), 
-    new StationParamsSlot(StationSlotsDir.Ingress, 3), 
-    null, 
+    null,
+    new StationParamsSlot(StationSlotsDir.Egress, 0),  //iron_ore_1 
+    new StationParamsSlot(StationSlotsDir.Ingress, 3), //blue_matrix_0
+
+    new StationParamsSlot(StationSlotsDir.Ingress, 3), //blue_matrix_1
+    new StationParamsSlot(StationSlotsDir.Ingress, 3), //blue_matrix_2
+    new StationParamsSlot(StationSlotsDir.Ingress, 3), //blue_matrix_3
 
     null,
     null,
     null,
 
-    new StationParamsSlot(StationSlotsDir.Egress, 1), 
-    new StationParamsSlot(StationSlotsDir.Egress, 0),
-    new StationParamsSlot(StationSlotsDir.Egress, 0), 
+    new StationParamsSlot(StationSlotsDir.Egress, 1), //copper_ore
+    new StationParamsSlot(StationSlotsDir.Egress, 0), //iron_ore_0
+    new StationParamsSlot(StationSlotsDir.Egress, 2), //accelerator
 ]
 
