@@ -6,9 +6,11 @@
 
 ## 试用
 
-> npm i 
-> npm start --output=output.json
-> ./third/dspbp.exe -i output.json -o output.txt undump 
+```
+npm i 
+npm start --output=output.json
+./third/dspbp.exe -i output.json -o output.txt undump 
+```
 
 ## 当前状态
 
@@ -24,9 +26,11 @@ The compiler to convert blueprint.json to blueprint.txt is copy from  https://gi
 
 ## Test
 
-> npm i 
-> npm start --output=output.json
-> ./third/dspbp.exe -i output.json -o output.txt undump 
+```
+npm i 
+ npm start --output=output.json
+ ./third/dspbp.exe -i output.json -o output.txt undump 
+```
 
 # Current Status
 
