@@ -82,9 +82,15 @@ export class BlueArray7200 {
             this.spray_coaters.push(spray_coater)
         }
 
+        let lab_stack:LabStack
         this.labs = new Array<LabStack>()
         for(let i = 0; i < building_num.blue_matrix; i++) {
-            let lab_stack:LabStack = new LabStack(area_index, null, LabsParamResearch.Produce, undefined, 9, AccelerateMode.Increase) 
+            if (i % 5 == 4) {
+                lab_stack = new LabStack(area_index, null, LabsParamResearch.Produce, 12, 9, AccelerateMode.Increase) 
+            }
+            else {
+                lab_stack = new LabStack(area_index, null, LabsParamResearch.Produce, 15, 9, AccelerateMode.Increase) 
+            }
             lab_stack.getLabs().forEach(lab => bp.addBuilding(lab))
             lab_stack.initLabStacks()
             this.labs.push(lab_stack)
@@ -142,6 +148,7 @@ export class BlueArray7200 {
         for(let i = 0; i < belt_num.blue_array_1; i++) this.belts[belt_index.blue_matrix_1].push(bp.addBuilding(new Belt(area_index, null)) as Belt)
         for(let i = 0; i < belt_num.blue_array_2; i++) this.belts[belt_index.blue_matrix_2].push(bp.addBuilding(new Belt(area_index, null)) as Belt)
         for(let i = 0; i < belt_num.blue_array_3; i++) this.belts[belt_index.blue_matrix_3].push(bp.addBuilding(new Belt(area_index, null)) as Belt)
+        for(let i = 0; i < belt_num.blue_array_4; i++) this.belts[belt_index.blue_matrix_4].push(bp.addBuilding(new Belt(area_index, null)) as Belt)
         
         this.belts[belt_index.iron_ore_0][0].setLabel(1001)
         this.belts[belt_index.iron_ore_1][0].setLabel(1001)
@@ -176,6 +183,7 @@ export class BlueArray7200 {
         this.belts[belt_index.blue_matrix_1][0].setLabel(6001)
         this.belts[belt_index.blue_matrix_2][0].setLabel(6001)
         this.belts[belt_index.blue_matrix_3][0].setLabel(6001)
+        this.belts[belt_index.blue_matrix_4][0].setLabel(6001)
 
     }
 
@@ -338,8 +346,8 @@ export class BlueArray7200 {
         this.addTeslaCoil(local_diff_2(local_base_assembler_circuit_board, [7.25, 7.0, 0]))
         for (let i = 0; i < 16; i++) {
             let assembler = this.assemblers[assembler_index.circuit_board][i]
-            this.setIngressInserterWithAssembler(ingress_inserter_index.circuit_board_0, i, assembler, assembler.getLocal()[2] == 0 ? 6 : 2, belt_index.iron_plate_0 + Math.floor(i / 4), i % 4)
-            this.setIngressInserterWithAssembler(ingress_inserter_index.circuit_board_1, i, assembler, assembler.getLocal()[2] == 0 ? 7 : 1, belt_index.copper_plate_0 + Math.floor(i / 8), i % 8)
+            this.setIngressInserterWithAssembler(ingress_inserter_index.circuit_board_0, i, assembler, assembler.getLocal()[2] == 0 ? 6 : 2, belt_index.iron_plate_0 + Math.floor(i / 4), 12 + i % 4)
+            this.setIngressInserterWithAssembler(ingress_inserter_index.circuit_board_1, i, assembler, assembler.getLocal()[2] == 0 ? 7 : 1, belt_index.copper_plate_0 + Math.floor(i / 8), 14 + i % 8)
             this.setEgressInserterWithAssembler(egress_inserter_index.circuit_board, i, assembler, assembler.getLocal()[2] == 0 ? 8 : 0, belt_index.circuit_board_0 + Math.floor(i / 4), i % 4)
         }
 
@@ -350,8 +358,8 @@ export class BlueArray7200 {
         this.addTeslaCoil(local_diff_2(local_base_assembler_magnetism_wire, [7.25, 7, 0]))
         for (let i = 0; i < 16; i++) {
             let assembler = this.assemblers[assembler_index.magnetism_wire][i]
-            this.setIngressInserterWithAssembler(ingress_inserter_index.magnetism_wire_0, i, assembler, assembler.getLocal()[2] == 0 ? 6 : 2, belt_index.magnet_plate_0 + Math.floor(i / 4), i % 4)
-            this.setIngressInserterWithAssembler(ingress_inserter_index.magnetism_wire_1, i, assembler, assembler.getLocal()[2] == 0 ? 7 : 1, belt_index.copper_plate_2 + Math.floor(i / 8), i % 8)
+            this.setIngressInserterWithAssembler(ingress_inserter_index.magnetism_wire_0, i, assembler, assembler.getLocal()[2] == 0 ? 6 : 2, belt_index.magnet_plate_0 + Math.floor(i / 4), 15 + i % 4)
+            this.setIngressInserterWithAssembler(ingress_inserter_index.magnetism_wire_1, i, assembler, assembler.getLocal()[2] == 0 ? 7 : 1, belt_index.copper_plate_2 + Math.floor(i / 8), 14 + i % 8)
             this.setEgressInserterWithAssembler(egress_inserter_index.magnetism_wire, i, assembler, assembler.getLocal()[2] == 0 ? 8 : 0, belt_index.magnetism_wire_0 + Math.floor(i / 4), i % 4)
         }
 
@@ -362,13 +370,13 @@ export class BlueArray7200 {
         for (let i = 0; i < 7; i++) {
             this.labs[i].setLocal(local_diff(local_diff(local_base_lab_1, [2.5, 0, 0]), [5 * i, 0, 0]))
             if (i < 5) {
-                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_0, i, this.labs[i], 2, belt_index.magnetism_wire_0, i)
-                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_1, i,  this.labs[i], 1, belt_index.circuit_board_0, i)
+                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_0, i, this.labs[i], 2, belt_index.magnetism_wire_0, 13 + i)
+                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_1, i,  this.labs[i], 1, belt_index.circuit_board_0, 13 + i)
                 this.setEgressInserterWithLab(egress_inserter_index.blue_matrix, i,  this.labs[i], 0, belt_index.blue_matrix_0, i)
             }
             else {
-                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_0, i,  this.labs[i], 2, belt_index.magnetism_wire_1, i - 5)
-                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_1, i,  this.labs[i], 1, belt_index.circuit_board_1, i - 5)
+                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_0, i,  this.labs[i], 2, belt_index.magnetism_wire_1, 13 + i - 5)
+                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_1, i,  this.labs[i], 1, belt_index.circuit_board_1, 13 + i - 5)
                 this.setEgressInserterWithLab(egress_inserter_index.blue_matrix, i,  this.labs[i], 0, belt_index.blue_matrix_1, i - 5)
             }
         }
@@ -379,29 +387,51 @@ export class BlueArray7200 {
         for (let i = 7; i < 12; i++) {
             this.labs[i].setLocal(local_diff(local_diff(local_base_lab_2, [0, 2.5, 0]), [0, 5*(i - 7), 0]))
             if (i < 10) {
-                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_0, i,  this.labs[i], 3, belt_index.magnetism_wire_1, i - 5)
-                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_1, i,  this.labs[i], 4, belt_index.circuit_board_1, i - 5)
+                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_0, i,  this.labs[i], 3, belt_index.magnetism_wire_1, 13 + i - 5)
+                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_1, i,  this.labs[i], 4, belt_index.circuit_board_1, 13 + i - 5)
                 this.setEgressInserterWithLab(egress_inserter_index.blue_matrix, i,  this.labs[i], 5, belt_index.blue_matrix_1, i - 5)
             }
             else {
-                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_0,  i, this.labs[i], 3, belt_index.magnetism_wire_2, i - 10)
-                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_1, i,  this.labs[i], 4, belt_index.circuit_board_2, i - 10)
+                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_0,  i, this.labs[i], 3, belt_index.magnetism_wire_2, 13 + i - 10)
+                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_1, i,  this.labs[i], 4, belt_index.circuit_board_2, 13 + i - 10)
                 this.setEgressInserterWithLab(egress_inserter_index.blue_matrix, i,  this.labs[i], 5, belt_index.blue_matrix_2, i - 10)
             }
         }
         for (let i = 12; i < building_num.blue_matrix; i++) {
             this.labs[i].setLocal(local_diff(local_diff(local_base_lab_2, [6.5, 2.5, 0]), [0, 5*(i - 12), 0]))
             if (i < 15) {
-                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_0, i,  this.labs[i], 9, belt_index.magnetism_wire_2, i - 10)
-                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_1,  i, this.labs[i], 10, belt_index.circuit_board_2, i - 10)
+                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_0, i,  this.labs[i], 9, belt_index.magnetism_wire_2, 13 + i - 10)
+                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_1,  i, this.labs[i], 10, belt_index.circuit_board_2, 13 + i - 10)
                 this.setEgressInserterWithLab(egress_inserter_index.blue_matrix,  i, this.labs[i], 11, belt_index.blue_matrix_2, i - 10)
             }
             else {
-                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_0,  i, this.labs[i], 9, belt_index.magnetism_wire_3, i - 15)
-                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_1, i,  this.labs[i], 10, belt_index.circuit_board_3, i - 15)
+                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_0,  i, this.labs[i], 9, belt_index.magnetism_wire_3, 13 + i - 15)
+                this.setIngressInserterWithLab(ingress_inserter_index.blue_matrix_1, i,  this.labs[i], 10, belt_index.circuit_board_3, 13 + i - 15)
                 this.setEgressInserterWithLab(egress_inserter_index.blue_matrix,  i, this.labs[i], 11, belt_index.blue_matrix_3, i - 15)
             }
         }
+
+        for (let i = 0; i < 4; i++) {
+            this.setEgressInserterWithLab(egress_inserter_index.blue_matrix, i,  this.labs[i], 0, belt_index.blue_matrix_0, i)
+        }
+        for (let i = 4; i < 8; i++) {
+            if (i >= 7) {
+                this.setEgressInserterWithLab(egress_inserter_index.blue_matrix, i,  this.labs[i], 5, belt_index.blue_matrix_1, i - 4)
+            }
+            else {
+                this.setEgressInserterWithLab(egress_inserter_index.blue_matrix, i,  this.labs[i], 0, belt_index.blue_matrix_1, i - 4)
+            }
+        }
+        for (let i = 8; i < 12; i++) {
+            this.setEgressInserterWithLab(egress_inserter_index.blue_matrix, i,  this.labs[i], 5, belt_index.blue_matrix_2, i - 8)
+        }
+        for (let i = 12; i < 16; i++) {
+            this.setEgressInserterWithLab(egress_inserter_index.blue_matrix, i,  this.labs[i], 11, belt_index.blue_matrix_3, i - 12)
+        }
+        for (let i = 16; i < 20; i++) {
+            this.setEgressInserterWithLab(egress_inserter_index.blue_matrix, i,  this.labs[i], 11, belt_index.blue_matrix_4, i - 16)
+        }
+
         this.addTeslaCoil(local_diff_2(local_base_lab_2, [3.5, 9.25, 0]))
         this.addTeslaCoil(local_diff_2(local_base_lab_2, [3.5, 19.25, 0]))
         this.addTeslaCoil(local_diff_2(local_base_lab_2, [3.5, 31.25, 0]))
@@ -503,31 +533,36 @@ export class BlueArray7200 {
         
         this.belts[belt_index.iron_ore_1] = prependBelts(this.bp, this.belts[belt_index.iron_ore_1], 1, [-0.5, 0, 0])
         this.belts[belt_index.iron_ore_1] = prependBelts(this.bp, this.belts[belt_index.iron_ore_1], 6, [0, 0, 1])
+        this.belts[belt_index.iron_ore_1] = prependBelts(this.bp, this.belts[belt_index.iron_ore_1], 1, [-1, 0, 0])
         this.belts[belt_index.iron_ore_1] = prependBelts(this.bp, this.belts[belt_index.iron_ore_1], 2, [0, -1, 0])
 
 
         this.belts[belt_index.station_iron_ore_0] = this.station.setBeltLocal(bp, 10)
-        this.belts[belt_index.station_iron_ore_1] = this.station.setBeltLocal(bp, 1)
+        this.belts[belt_index.station_iron_ore_1] = this.station.setBeltLocal(bp, 0)
         this.belts[belt_index.station_copper_ore] = this.station.setBeltLocal(bp, 9)
         this.belts[belt_index.station_accelerator] = this.station.setBeltLocal(bp, 11)
-        this.belts[belt_index.station_blue_matrix_0] = this.station.setBeltLocal(bp, 2)
-        this.belts[belt_index.station_blue_matrix_1] = this.station.setBeltLocal(bp, 3)
-        this.belts[belt_index.station_blue_matrix_2] = this.station.setBeltLocal(bp, 4)
-        this.belts[belt_index.station_blue_matrix_3] = this.station.setBeltLocal(bp, 5)
+        this.belts[belt_index.station_blue_matrix_0] = this.station.setBeltLocal(bp, 1)
+        this.belts[belt_index.station_blue_matrix_1] = this.station.setBeltLocal(bp, 2)
+        this.belts[belt_index.station_blue_matrix_2] = this.station.setBeltLocal(bp, 3)
+        this.belts[belt_index.station_blue_matrix_3] = this.station.setBeltLocal(bp, 4)
+        this.belts[belt_index.station_blue_matrix_4] = this.station.setBeltLocal(bp, 5)
 
         connectBelts([this.belts[belt_index.station_copper_ore][1], this.belts[belt_index.copper_ore][0]])
         connectBelts([this.belts[belt_index.station_iron_ore_0][1], this.belts[belt_index.iron_ore_0][0]])
         connectBelts([this.belts[belt_index.station_iron_ore_1][1], this.belts[belt_index.iron_ore_1][0]])
 
         let local_blue_matrix_base: [number, number, number]
-        local_blue_matrix_base = local_diff(this.belts[belt_index.station_blue_matrix_0][0].getLocal(), [8, -0.5, 0])
+        local_blue_matrix_base = local_diff(this.belts[belt_index.station_blue_matrix_0][0].getLocal(), [8, -2, 0])
         this.belts[belt_index.blue_matrix_0].forEach((belt, index) => {belt.setLocal(local_diff(local_blue_matrix_base, [-1 * index, 0, 0]))})
+        appendBelts(bp, this.belts[belt_index.blue_matrix_0], 1, [-1, 0, 0])
+        appendBelts(bp, this.belts[belt_index.blue_matrix_0], 1, [0, 1, 0])
         connectBelts([this.belts[belt_index.blue_matrix_0][this.belts[belt_index.blue_matrix_0].length - 1], this.belts[belt_index.station_blue_matrix_0][0]])
 
-        local_blue_matrix_base = local_diff(this.belts[belt_index.station_blue_matrix_1][0].getLocal(), [8, 0, 0])
+        local_blue_matrix_base = local_diff(this.belts[belt_index.station_blue_matrix_1][0].getLocal(), [8, -1, 0])
         this.belts[belt_index.blue_matrix_1].forEach((belt, index) => {belt.setLocal(local_diff(local_blue_matrix_base, [-1 * index, 0, 0]))})
+        appendBelts(bp, this.belts[belt_index.blue_matrix_1], 1, [-1, 0, 0])
         connectBelts([this.belts[belt_index.blue_matrix_1][this.belts[belt_index.blue_matrix_1].length - 1], this.belts[belt_index.station_blue_matrix_1][0]])
-        
+
         local_blue_matrix_base = local_diff(this.belts[belt_index.station_blue_matrix_2][0].getLocal(), [8, 0, 0])
         this.belts[belt_index.blue_matrix_2].forEach((belt, index) => {belt.setLocal(local_diff(local_blue_matrix_base, [-1 * index, 0, 0]))})
         connectBelts([this.belts[belt_index.blue_matrix_2][this.belts[belt_index.blue_matrix_2].length - 1], this.belts[belt_index.station_blue_matrix_2][0]])
@@ -535,6 +570,10 @@ export class BlueArray7200 {
         local_blue_matrix_base = local_diff(this.belts[belt_index.station_blue_matrix_3][0].getLocal(), [8, 0, 0])
         this.belts[belt_index.blue_matrix_3].forEach((belt, index) => {belt.setLocal(local_diff(local_blue_matrix_base, [-1 * index, 0, 0]))})
         connectBelts([this.belts[belt_index.blue_matrix_3][this.belts[belt_index.blue_matrix_3].length - 1], this.belts[belt_index.station_blue_matrix_3][0]])
+        
+        local_blue_matrix_base = local_diff(this.belts[belt_index.station_blue_matrix_4][0].getLocal(), [8, 0, 0])
+        this.belts[belt_index.blue_matrix_4].forEach((belt, index) => {belt.setLocal(local_diff(local_blue_matrix_base, [-1 * index, 0, 0]))})
+        connectBelts([this.belts[belt_index.blue_matrix_4][this.belts[belt_index.blue_matrix_4].length - 1], this.belts[belt_index.station_blue_matrix_4][0]])
         
         
         let local_accelerator = local_diff(this.spray_coaters[belt_index.iron_ore_1].getLocal(), [1, 5, -6])

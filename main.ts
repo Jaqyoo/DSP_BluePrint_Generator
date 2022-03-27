@@ -8,9 +8,10 @@ let timestamp = 637795946688143437
 let cursor_offset_x = 1
 let cursor_offset_y = 2
 let cursor_target_area = 0
-let dragbox_size_x = 3
-let dragbox_size_y = 5
-let bp = new BluePrint(timestamp,cursor_offset_x,cursor_offset_y,cursor_target_area,dragbox_size_x, dragbox_size_y)
+let dragbox_size_x = 39
+let dragbox_size_y = 49
+let layout = 10
+let bp = new BluePrint(timestamp,cursor_offset_x,cursor_offset_y,cursor_target_area,dragbox_size_x, dragbox_size_y, layout, 6001, 0, 0, 0, 0, "7200_eletric_matrix")
 
 let parent_index = -1
 let tropic_anchor = 0

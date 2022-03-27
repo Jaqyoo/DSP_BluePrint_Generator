@@ -12,7 +12,7 @@
 
 ## 当前状态
 
-7200 蓝糖（未完成，缺物流塔出入口和垂直传送带）
+7200 蓝糖
 
 ----
 
@@ -30,4 +30,4 @@ The compiler to convert blueprint.json to blueprint.txt is copy from  https://gi
 
 # Current Status
 
-7200 Electric Matrix (not complete for the station and the belts)
+7200 Electric Matrix 

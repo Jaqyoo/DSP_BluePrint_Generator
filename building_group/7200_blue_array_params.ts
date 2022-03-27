@@ -67,6 +67,7 @@ export enum belt_index {
     blue_matrix_1,
     blue_matrix_2,
     blue_matrix_3,
+    blue_matrix_4,
 
     accelerator,
 
@@ -78,6 +79,7 @@ export enum belt_index {
     station_blue_matrix_1,
     station_blue_matrix_2,
     station_blue_matrix_3,
+    station_blue_matrix_4,
 
     max,
 }
@@ -149,10 +151,10 @@ export const belt_num = {
     magnet_plate_2: 19, // 9 + 6 + 4
     magnet_plate_3: 19, // 9 + 6 + 4
 
-    copper_plate_0: 22, // 6 + 12 + 4
-    copper_plate_1: 22, // 6 + 12 + 4
-    copper_plate_2: 22, // 6 + 12 + 4
-    copper_plate_3: 22, // 6 + 12 + 4
+    copper_plate_0: 22, // 6 + 6 + 10
+    copper_plate_1: 22, // 6 + 6 + 10
+    copper_plate_2: 22, // 6 + 6 + 10
+    copper_plate_3: 22, // 6 + 6 + 10
 
     circuit_board_0: 18, // 4 + 6 + 8
     circuit_board_1: 18, // 4 + 6 + 8
@@ -164,32 +166,33 @@ export const belt_num = {
     magnetism_wire_2: 18, // 4 + 6 + 8
     magnetism_wire_3: 18, // 4 + 6 + 8
 
-    blue_array_0:8, // 8 + ?
-    blue_array_1:8, // 8 + ?
-    blue_array_2:8, // 8 + ?
-    blue_array_3:8, // 8 + ?
+    blue_array_0:8, // 5 + ?
+    blue_array_1:8, // 5 + ?
+    blue_array_2:8, // 5 + ?
+    blue_array_3:8, // 5 + ?
+    blue_array_4:8, // 5 + ?
 }
 
 export const station_storage:Array<StationParamStorage> = [
     {
         // 铁
         itemId:1001,
-        localLogic: StationLocalLogic.Storage,
-        remoteLogic: StationRemoteLogic.Storage,
+        localLogic: StationLocalLogic.Ingress,
+        remoteLogic: StationRemoteLogic.Ingress,
         max: 20000
     },
     {
         // 铜
         itemId:1002,
-        localLogic: StationLocalLogic.Storage,
-        remoteLogic: StationRemoteLogic.Storage,
+        localLogic: StationLocalLogic.Ingress,
+        remoteLogic: StationRemoteLogic.Ingress,
         max: 20000
     },
     {
         // 增产III
         itemId:1143,
-        localLogic: StationLocalLogic.Storage,
-        remoteLogic: StationRemoteLogic.Storage,
+        localLogic: StationLocalLogic.Ingress,
+        remoteLogic: StationRemoteLogic.Ingress,
         max: 20000
     },
     {
@@ -202,20 +205,20 @@ export const station_storage:Array<StationParamStorage> = [
     {
         // 蓝糖
         itemId:6001,
-        localLogic: StationLocalLogic.Storage,
-        remoteLogic: StationRemoteLogic.Storage,
+        localLogic: StationLocalLogic.Egress,
+        remoteLogic: StationRemoteLogic.Egress,
         max: 20000
     },
 ]
 
 export const station_slot = [
-    null,
     new StationParamsSlot(StationSlotsDir.Egress, 0),  //iron_ore_1 
     new StationParamsSlot(StationSlotsDir.Ingress, 3), //blue_matrix_0
-
     new StationParamsSlot(StationSlotsDir.Ingress, 3), //blue_matrix_1
+
     new StationParamsSlot(StationSlotsDir.Ingress, 3), //blue_matrix_2
     new StationParamsSlot(StationSlotsDir.Ingress, 3), //blue_matrix_3
+    new StationParamsSlot(StationSlotsDir.Ingress, 3), //blue_matrix_4
 
     null,
     null,
